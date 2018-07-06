@@ -10,6 +10,7 @@ if [[ $# -lt 3 ]]; then
   echo '  reclaim is a standard OCP PV reclaimation policy: Retain, Recycle, or Delete'
   echo '  access is a standard OCP PV access mode: ReadWriteOnce, ReadOnlyMany, or ReadWriteMany'
   echo 'Creates OCP PersistentVolume definitions. The currently logged in OCP user must'
+  echo '  be able to run privileged Ansible commands against the NFS server and'
   echo '  have "cluster-admin" privileges as this script uses "oc create" to operate.'
   echo 'Multiple <count>:<capacity>:<reclaim>:<access> parameters can be provided.'
   echo 'PV names start with "pv1" and count up for each PV configuration set specified.'
@@ -21,9 +22,15 @@ if [[ $# -lt 3 ]]; then
   exit
 fi
 
+nfs_exports_file="/etc/exports.d/openshift-uservols.exports"
+
 server=$1
 base_path=$2
 shift 2
+
+ansible ${server} --become -m file -a "path=${base_path} state=absent"
+ansible ${server} --become -m file -a "path=${base_path} owner=nfsnobody group=nfsnobody mode=0777 state=directory"
+ansible ${server} --become -m file -a "path=${nfs_exports_file} state=absent"
 
 pvnum=1
 
@@ -38,8 +45,12 @@ for pvspec ; do
     volume="pv${pvnum}"
     echo "Creating PV \"${volume}\": capacity-\"${capacity}\", reclaim policy-\"${reclaim}\", access mode-\"${access}\""
 
-#    cat << EOF | oc create -f -
-    cat << EOF
+    ansible ${server} --become -m file -a "path=${base_path}/${volume} owner=nfsnobody group=nfsnobody mode=0777 state=directory"
+    ansible ${server} --become -m shell -a "echo ${base_path}/${volume} *\(rw,root_squash\) >>${nfs_exports_file}"
+
+    oc delete pv ${volume} --ignore-not-found
+    
+    cat << EOF | oc create -f -
 {
   "apiVersion": "v1",
   "kind": "PersistentVolume",
@@ -63,3 +74,9 @@ EOF
   pvnum=$((pvnum + 1))
   done
 done
+
+ansible ${server} --become -m systemd -a "name=nfs-server state=restarted"
+
+openshift_version=`oc version | grep -E '^openshift' | cut -d " " -f 2`
+ansible nodes -m shell -a "docker pull registry.access.redhat.com/openshift3/ose-recycler:latest"
+ansible nodes -m shell -a "docker tag registry.access.redhat.com/openshift3/ose-recycler:latest registry.access.redhat.com/openshift3/ose-recycler:${openshift_version}"
