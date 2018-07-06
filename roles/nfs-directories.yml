@@ -1,0 +1,23 @@
+
+- name: Remove nfs_base_path
+  file:
+    path: "{{ nfs_base_path }}"
+    state: absent
+
+- name: Create nfs_base_path
+  file:
+    path: "{{ nfs_base_path }}"
+    owner: nfsnobody
+    group: nfsnobody
+    mode: 0777
+    state: directory
+
+- name: Remove exports file
+  file:
+    path: "{{ nfs_exports_file }}"
+    state: absent
+
+- name: Restart NFS server
+  systemd:
+    name: nfs-server
+    state: restarted
