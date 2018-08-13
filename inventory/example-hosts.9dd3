@@ -164,16 +164,13 @@ infranode2.9dd3.internal openshift_hostname=infranode2.9dd3.internal  openshift_
 node1.9dd3.internal openshift_hostname=node1.9dd3.internal  openshift_node_labels="{'logging': 'true', 'env':'app', 'cluster': '9dd3'}"
 node2.9dd3.internal openshift_hostname=node2.9dd3.internal  openshift_node_labels="{'logging': 'true', 'env':'app', 'cluster': '9dd3'}"
 node3.9dd3.internal openshift_hostname=node3.9dd3.internal  openshift_node_labels="{'logging': 'true', 'env':'app', 'cluster': '9dd3'}"
+node4.9dd3.internal openshift_hostname=node4.9dd3.internal  openshift_node_labels="{'logging': 'true', 'env':'app', 'cluster': '9dd3'}"
 
 ## These are CNS nodes
 # support1.9dd3.internal openshift_hostname=support1.9dd3.internal  openshift_node_labels="{'logging': 'true', 'env':'glusterfs', 'cluster': '9dd3'}"
-# support2.9dd3.internal openshift_hostname=support2.9dd3.internal  openshift_node_labels="{'logging': 'true', 'env':'glusterfs', 'cluster': '9dd3'}"
-# support3.9dd3.internal openshift_hostname=support3.9dd3.internal  openshift_node_labels="{'logging': 'true', 'env':'glusterfs', 'cluster': '9dd3'}"
 
 [nfs]
 support1.9dd3.internal openshift_hostname=support1.9dd3.internal
 
 #[glusterfs]
 # support1.9dd3.internal glusterfs_devices='[ "/dev/xvdd" ]'
-# support2.9dd3.internal glusterfs_devices='[ "/dev/xvdd" ]'
-# support3.9dd3.internal glusterfs_devices='[ "/dev/xvdd" ]'
