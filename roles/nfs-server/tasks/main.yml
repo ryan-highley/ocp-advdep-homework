@@ -17,6 +17,13 @@
     path: "{{ nfs_exports_file }}"
     state: absent
 
+- name: Create PV
+  debug:
+    msg: "PV {{ index }} - {{ item.capacity }}, {{ item.reclaim }}, {{ item.access }}"
+  loop: "{{ pv_specs | flatten(levels=1) }}"
+  loop_control:
+    index_var: index
+  
 - name: Restart NFS server
   systemd:
     name: nfs-server

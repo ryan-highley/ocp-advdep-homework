@@ -1,18 +1,34 @@
 ---
-#- name: Standard OpenShift Ansible Prerequisites Playbook
-#  include_playbook: /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml
+- name: Ensure ansible connectivity
+  hosts: all
+  tasks: ping
 
-#- name: Standard OpenShift Ansible Deploy Cluster Playbook
-#  include_playbook: /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml
+- name: Update all packages
+  hosts: all
+  tasks:
+    - yum:
+      name: '*'
+      status: latest
 
-#- name: Deploy MitziCom OpenShift Container Platform Environment
-#  hosts: all
-#  gather_facts: false
-#  roles:
-#  - role: openshift-applier
+- name: Ensure docker is running on nodes
+  hosts: nodes
+  tasks:
+  - shell: "systemctl status docker | grep Active"
+
+# - name: Standard OpenShift Ansible Prerequisites Playbook
+#   include_playbook: /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml
+
+# - name: Standard OpenShift Ansible Deploy Cluster Playbook
+#   include_playbook: /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml
+
+# - name: Deploy MitziCom OpenShift Container Platform Environment
+#   hosts: all
+#   gather_facts: false
+#   roles:
+#   - role: openshift-applier
 
 - name: Configure NFS PersistentVolumes
   hosts: nfs
   gather_facts: false
   roles:
-  - role: nfs-directories.yml
+  - role: nfs-server

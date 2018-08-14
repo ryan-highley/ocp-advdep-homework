@@ -17,7 +17,7 @@ if [[ $# -lt 3 ]]; then
   echo 'NFS export directory paths must match the PV name, e.g. given "base_path" of'
   echo '  "/srv/nfs/user-vols", NFS exports must specify "/srv/nfs/user-vols/pv1",'
   echo '  "/srv/nfs/user-vols/pv2", etc.'
-  echo 'example: ./create_pvs.sh support1.3aff.internal /src/nfs/user-vols 25:5Gi:Recycle:ReadWriteOnce 25:10Gi:Retain:ReadWriteMany'
+  echo 'example: ./create_pvs.sh support1.3aff.internal /srv/nfs/user-vols 25:5Gi:Recycle:ReadWriteOnce 25:10Gi:Retain:ReadWriteMany'
   echo
   exit
 fi

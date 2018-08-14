@@ -1,0 +1,5 @@
+nfs_base_path: "/srv/nfs/user-vols"
+nfs_exports_file: "/etc/exports.d/openshift-uservols.exports"
+pv_specs:
+  - { count: 25, capacity: '5Gi', reclaim: 'Recycle', access: 'ReadWriteOnce' }
+  - { count: 25, capacity: '10Gi', reclaim: 'Retain', access: 'ReadWriteMany' }
