@@ -1,19 +1,22 @@
 ---
 - name: Ensure ansible connectivity
   hosts: all
-  tasks: ping
+  gather_facts: false
+  tasks:
+  - ping:
 
 - name: Update all packages
   hosts: all
+  gather_facts: false
   tasks:
-    - yum:
+  - yum:
       name: '*'
-      status: latest
+      state: 'latest'
 
 - name: Ensure docker is running on nodes
   hosts: nodes
   tasks:
-  - shell: "systemctl status docker | grep Active"
+  - shell: 'systemctl status docker | grep Active'
 
 # - name: Standard OpenShift Ansible Prerequisites Playbook
 #   include_playbook: /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml

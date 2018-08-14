@@ -19,10 +19,8 @@
 
 - name: Create PV
   debug:
-    msg: "PV {{ index }} - {{ item.capacity }}, {{ item.reclaim }}, {{ item.access }}"
-  loop: "{{ pv_specs | flatten(levels=1) }}"
-  loop_control:
-    index_var: index
+    msg: "PV {{ item.count }} - {{ item.capacity }}, {{ item.reclaim }}, {{ item.access }}"
+  with_dict: "{{ pv_specs }}"
   
 - name: Restart NFS server
   systemd:
