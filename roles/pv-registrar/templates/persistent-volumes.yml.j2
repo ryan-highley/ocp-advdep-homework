@@ -1,0 +1,27 @@
+---
+apiVersion: v1
+kind: List
+items:
+{% set pv_index = 1 %}
+{% for pv_spec in pv_specs %}
+{% for i in range(pv_spec.count) %}
+{% set pv_name = "pv" ~ pv_index %}
+- apiVersion: v1
+  kind: PersistentVolume
+  metadata:
+    name: "{{ pv_name }}"
+  spec:
+    capacity:
+      storage: "{{ pv_spec.capacity }}"
+    accessModes:
+    - "{{ pv_spec.access }}"
+    nfs:
+      path: "{{ nfs_base_path }}/{{ pv_name }}"
+      server: "{{ groups['nfs'][0] }}"
+    persistentVolumeReclaimPolicy: "{{ pv_spec.reclaim }}"
+{% set pv_index = pv_index + 1 %}
+{% endfor %}
+
+{# Hack for Jinja templating variable scoping #}
+{% set pv_index = pv_index + pv_spec.count %}
+{% endfor %}

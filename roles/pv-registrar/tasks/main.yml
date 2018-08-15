@@ -1,0 +1,20 @@
+---
+- name: Create persistent_volume definitions
+  template:
+    src: templates/persistent-volumes.yml.j2
+    dest: "{{ pv_def_tmp_file }}"
+
+- name: Delete existing persistent_volume definitions
+  command: "oc delete -f {{ pv_def_tmp_file }} --ignore-not-found"
+
+- name: Register persistent_volumes
+  command: "oc create -f {{ pv_def_tmp_file }}"
+  register: pv_create_output
+  failed_when: "('already exists' not in pv_create_output.stderr) and ('created' not in pv_create_output.stdout) and pv_create_output.rc != 0"
+  changed_when: "('created' in pv_create_output.stdout)"
+
+- name: Remove persistent_volume definitions file
+  file:
+    path: "{{ pv_def_tmp_file }}"
+    state: absent
+

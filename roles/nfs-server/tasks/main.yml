@@ -4,25 +4,34 @@
     path: "{{ nfs_base_path }}"
     state: absent
 
-- name: Create nfs_base_path
+- name: Remove exports file
+  file:
+    path: "{{ nfs_exports_file }}"
+    state: absent
+
+- name: Count PVs to create
+  set_fact:
+    pv_count: "{{ pv_specs|map(attribute='count')|sum }}"
+
+- name: Create PV directories
+  shell: "mkdir -p {{ nfs_base_path  ~ '/pv{1..' ~ pv_count ~ '}' }}"
+
+- name: Set owner, group, and mode on PV directories
   file:
     path: "{{ nfs_base_path }}"
     owner: nfsnobody
     group: nfsnobody
     mode: 0777
     state: directory
+    recurse: yes
 
-- name: Remove exports file
-  file:
-    path: "{{ nfs_exports_file }}"
-    state: absent
+- name: Create exports file
+  template:
+    src: templates/persistent_volumes_exports.d.j2
+    dest: "{{ nfs_exports_file }}"
 
-- name: Create PV
-  debug:
-    msg: "PV {{ item.count }} - {{ item.capacity }}, {{ item.reclaim }}, {{ item.access }}"
-  with_dict: "{{ pv_specs }}"
-  
 - name: Restart NFS server
   systemd:
     name: nfs-server
     state: restarted
+

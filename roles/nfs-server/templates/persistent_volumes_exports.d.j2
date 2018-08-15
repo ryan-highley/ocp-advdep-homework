@@ -1,0 +1,4 @@
+{% for idx in range(pv_count|int) %}
+{{ nfs_base_path ~ '/pv' ~ (idx + 1) ~ ' *(rw,root_squash)' }}
+{% endfor %}
+

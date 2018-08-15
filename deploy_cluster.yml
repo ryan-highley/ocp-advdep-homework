@@ -1,22 +1,22 @@
 ---
-- name: Ensure ansible connectivity
-  hosts: all
-  gather_facts: false
-  tasks:
-  - ping:
+# - name: Ensure ansible connectivity
+#   hosts: all
+#   gather_facts: false
+#   tasks:
+#   - ping:
 
-- name: Update all packages
-  hosts: all
-  gather_facts: false
-  tasks:
-  - yum:
-      name: '*'
-      state: 'latest'
+# - name: Update all packages
+#   hosts: all
+#   gather_facts: false
+#   tasks:
+#   - yum:
+#       name: '*'
+#       state: 'latest'
 
-- name: Ensure docker is running on nodes
-  hosts: nodes
-  tasks:
-  - shell: 'systemctl status docker | grep Active'
+# - name: Ensure docker is running on nodes
+#   hosts: nodes
+#   tasks:
+#   - shell: 'systemctl status docker | grep Active'
 
 # - name: Standard OpenShift Ansible Prerequisites Playbook
 #   include_playbook: /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml
@@ -30,8 +30,19 @@
 #   roles:
 #   - role: openshift-applier
 
-- name: Configure NFS PersistentVolumes
-  hosts: nfs
+# - name: Configure NFS Export Directories
+#   hosts: nfs
+#   gather_facts: false
+#   vars_files:
+#   - vars/persistent_volumes.yml
+#   roles:
+#   - role: nfs-server
+
+- name: Configure PVs
+  hosts: masters[0]
   gather_facts: false
+  vars_files:
+  - vars/persistent_volumes.yml
   roles:
-  - role: nfs-server
+  - role: pv-registrar
+
