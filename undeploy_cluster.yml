@@ -1,0 +1,11 @@
+---
+- name: Run standard OpenShift undeploy
+  import_playbook: /usr/share/ansible/openshift-ansible/playbooks/adhoc/uninstall.yml
+
+- name: Remove /etc/origin
+  hosts: nodes
+  tasks:
+  - file:
+      path: /etc/origin
+      state: absent
+

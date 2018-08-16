@@ -4,45 +4,136 @@
 #   gather_facts: false
 #   tasks:
 #   - ping:
-
+# 
 # - name: Update all packages
 #   hosts: all
 #   gather_facts: false
 #   tasks:
 #   - yum:
 #       name: '*'
-#       state: 'latest'
-
-# - name: Ensure docker is running on nodes
-#   hosts: nodes
+#       state: latest
+# 
+# - name: Ensure local has OpenShift utils and clients
+#   hosts: localhost
+#   gather_facts: false
 #   tasks:
-#   - shell: 'systemctl status docker | grep Active'
+#   - yum:
+#       name:
+#       - atomic-openshift-utils
+#       - atomic-openshift-clients
+#       state: latest
+# 
+- name: Ensure docker is running on nodes
+  hosts: nodes
+  gather_facts: false
+  tasks:
+  - systemd:
+      name: docker
+      state: started
+      enabled: true
 
 # - name: Standard OpenShift Ansible Prerequisites Playbook
-#   include_playbook: /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml
-
+#   import_playbook: /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml
+# 
 # - name: Standard OpenShift Ansible Deploy Cluster Playbook
-#   include_playbook: /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml
-
-# - name: Deploy MitziCom OpenShift Container Platform Environment
-#   hosts: all
+#   import_playbook: /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml
+# 
+# - name: Fetch system:admin auth
+#   hosts: masters[0]
 #   gather_facts: false
-#   roles:
-#   - role: openshift-applier
-
+#   tasks:
+#   - fetch:
+#       src: /root/.kube/config
+#       dest: /root/.kube/config
+#       flat: true
+# 
+# - name: Ensure local system:admin
+#   hosts: localhost
+#   gather_facts: false
+#   tasks:
+#   - shell: 'oc whoami'
+#     register: oc_whoami_result
+#     changed_when: false
+#     failed_when: "('system:admin' not in oc_whoami_result.stdout)"
+# 
+# - name: Add admin user and cluster role
+#   hosts: localhost
+#   gather_facts: false
+#   tasks:
+#   - shell: 'oc create user admin --full-name="Administrator"'
+#   - shell: 'oc create identity htpasswd_auth:admin'
+#   - shell: 'oc create useridentitymapping htpasswd_auth:admin admin'
+#   - shell: 'oc adm policy add-cluster-role-to-user cluster-admin admin'
+# 
 # - name: Configure NFS Export Directories
 #   hosts: nfs
 #   gather_facts: false
+#   vars:
+#     nfs_exports_file: /etc/exports.d/openshift-uservols.exports
 #   vars_files:
 #   - vars/persistent_volumes.yml
 #   roles:
 #   - role: nfs-server
+# 
+# - name: Configure PVs
+#   hosts: localhost
+#   gather_facts: false
+#   vars_files:
+#   - vars/persistent_volumes.yml
+#   roles:
+#   - role: pv-registrar
+# 
+- name: Get OpenShift version
+  hosts: localhost
+  gather_facts: false
+  tasks:
+  - shell: 'oc version | grep -E "^openshift" | cut -d " " -f 2'
+    register: openshift_version_out
+    changed_when: false
+  - set_fact:
+      openshift_version: "{{ openshift_version_out.stdout }}"
 
-- name: Configure PVs
-  hosts: masters[0]
+- name: Pull and tag ose-recycler Docker image
+  hosts: nodes
+  gather_facts: false
+  vars:
+    tag_version: "{{ hostvars['localhost']['openshift_version'] }}"
+  tasks:
+  - docker_image:
+      name: registry.access.redhat.com/openshift3/ose-recycler:latest
+      repository: "registry.access.redhat.com/openshift3/ose-recycler:{{ tag_version }}"
+      state: present
+
+- name: Update default project template
+  hosts: localhost
   gather_facts: false
   vars_files:
-  - vars/persistent_volumes.yml
+  - vars/default_projects.yml
   roles:
-  - role: pv-registrar
+  - role: default-project-updater
+
+- name: Update master configurations
+  hosts: masters
+  gather_facts: false
+  tasks:
+  - lineinfile:
+      path: /etc/origin/master/master-config.yaml
+      regexp: '^( *)projectRequestTemplate: '
+      line: '\1projectRequestTemplate: "default/project-request"'
+      backrefs: true
+  - systemd:
+      name: atomic-openshift-master-api
+      state: stopped
+  - systemd:
+      name: atomic-openshift-master-controllers
+      state: stopped
+  - systemd:
+      name: atomic-openshift-master-api
+      state: started
+  - systemd:
+      name: atomic-openshift-master-controllers
+      state: started
+  - systemd:
+      name: atomic-openshift-node
+      state: restarted
 

@@ -1,0 +1,27 @@
+---
+- name: Generate project request template
+  shell: "oc adm create-bootstrap-project-template -o yaml | sed 's/^parameters:/%{ default_project_objects }%parameters:/' >{{ default_project_request_template }}"
+
+- name: Update project request template with project objects
+  template:
+    src: "{{ default_project_request_template }}"
+    dest: "{{ default_project_request }}"
+    variable_start_string: "%{"
+    variable_end_string: "}%"
+
+- name: Create new project request template
+  shell: "oc create -n default -f {{ default_project_request }}"
+
+- name: Label default project
+  shell: "oc label namespace default name=default"
+  
+- name: Clean up template
+  file:
+    path: "{{ default_project_request_template }}"
+    state: absent
+
+- name: Clean up request
+  file:
+    path: "{{ default_project_request }}"
+    state: absent
+
