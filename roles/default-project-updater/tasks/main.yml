@@ -1,27 +1,29 @@
 ---
+- name: Create temp file
+  tempfile:
+    state: file
+  register: project_request_tempfile
+
 - name: Generate project request template
-  shell: "oc adm create-bootstrap-project-template -o yaml | sed 's/^parameters:/%{ default_project_objects }%parameters:/' >{{ default_project_request_template }}"
+  shell: "oc adm create-bootstrap-project-template -o yaml >{{ project_request_tempfile.path }}"
 
 - name: Update project request template with project objects
-  template:
-    src: "{{ default_project_request_template }}"
-    dest: "{{ default_project_request }}"
-    variable_start_string: "%{"
-    variable_end_string: "}%"
+  lineinfile:
+    insertbefore: '^parameters:'
+    line: "{{ default_project_objects }}"
+    path: "{{ project_request_tempfile.path }}"
+
+- name: Delete existing project request template
+  shell: "oc delete -n default -f {{ project_request_tempfile.path }}"
 
 - name: Create new project request template
-  shell: "oc create -n default -f {{ default_project_request }}"
+  shell: "oc create -n default -f {{ project_request_tempfile.path }}"
 
 - name: Label default project
-  shell: "oc label namespace default name=default"
+  shell: "oc label namespace default name=default --overwrite"
   
-- name: Clean up template
+- name: Clean up tempfile
   file:
-    path: "{{ default_project_request_template }}"
-    state: absent
-
-- name: Clean up request
-  file:
-    path: "{{ default_project_request }}"
+    path: "{{ project_request_tempfile.path }}"
     state: absent
 

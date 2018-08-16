@@ -23,15 +23,15 @@
 #       - atomic-openshift-clients
 #       state: latest
 # 
-- name: Ensure docker is running on nodes
-  hosts: nodes
-  gather_facts: false
-  tasks:
-  - systemd:
-      name: docker
-      state: started
-      enabled: true
-
+# - name: Ensure docker is running on nodes
+#   hosts: nodes
+#   gather_facts: false
+#   tasks:
+#   - systemd:
+#       name: docker
+#       state: started
+#       enabled: true
+# 
 # - name: Standard OpenShift Ansible Prerequisites Playbook
 #   import_playbook: /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml
 # 
@@ -83,26 +83,26 @@
 #   roles:
 #   - role: pv-registrar
 # 
-- name: Get OpenShift version
-  hosts: localhost
-  gather_facts: false
-  tasks:
-  - shell: 'oc version | grep -E "^openshift" | cut -d " " -f 2'
-    register: openshift_version_out
-    changed_when: false
-  - set_fact:
-      openshift_version: "{{ openshift_version_out.stdout }}"
-
-- name: Pull and tag ose-recycler Docker image
-  hosts: nodes
-  gather_facts: false
-  vars:
-    tag_version: "{{ hostvars['localhost']['openshift_version'] }}"
-  tasks:
-  - docker_image:
-      name: registry.access.redhat.com/openshift3/ose-recycler:latest
-      repository: "registry.access.redhat.com/openshift3/ose-recycler:{{ tag_version }}"
-      state: present
+# - name: Get OpenShift version
+#   hosts: localhost
+#   gather_facts: false
+#   tasks:
+#   - shell: 'oc version | grep -E "^openshift" | cut -d " " -f 2'
+#     register: openshift_version_out
+#     changed_when: false
+#   - set_fact:
+#       openshift_version: "{{ openshift_version_out.stdout }}"
+# 
+# - name: Pull and tag ose-recycler Docker image
+#   hosts: nodes
+#   gather_facts: false
+#   vars:
+#     tag_version: "{{ hostvars['localhost']['openshift_version'] }}"
+#   tasks:
+#   - docker_image:
+#       name: registry.access.redhat.com/openshift3/ose-recycler:latest
+#       repository: "registry.access.redhat.com/openshift3/ose-recycler:{{ tag_version }}"
+#       state: present
 
 - name: Update default project template
   hosts: localhost
@@ -112,28 +112,28 @@
   roles:
   - role: default-project-updater
 
-- name: Update master configurations
-  hosts: masters
-  gather_facts: false
-  tasks:
-  - lineinfile:
-      path: /etc/origin/master/master-config.yaml
-      regexp: '^( *)projectRequestTemplate: '
-      line: '\1projectRequestTemplate: "default/project-request"'
-      backrefs: true
-  - systemd:
-      name: atomic-openshift-master-api
-      state: stopped
-  - systemd:
-      name: atomic-openshift-master-controllers
-      state: stopped
-  - systemd:
-      name: atomic-openshift-master-api
-      state: started
-  - systemd:
-      name: atomic-openshift-master-controllers
-      state: started
-  - systemd:
-      name: atomic-openshift-node
-      state: restarted
-
+# - name: Update master configurations
+#   hosts: masters
+#   gather_facts: false
+#   tasks:
+#   - lineinfile:
+#       path: /etc/origin/master/master-config.yaml
+#       regexp: '^( *)projectRequestTemplate: '
+#       line: '\1projectRequestTemplate: "default/project-request"'
+#       backrefs: true
+#   - systemd:
+#       name: atomic-openshift-master-api
+#       state: stopped
+#   - systemd:
+#       name: atomic-openshift-master-controllers
+#       state: stopped
+#   - systemd:
+#       name: atomic-openshift-master-api
+#       state: started
+#   - systemd:
+#       name: atomic-openshift-master-controllers
+#       state: started
+#   - systemd:
+#       name: atomic-openshift-node
+#       state: restarted
+# 
