@@ -1,0 +1,6 @@
+---
+openshift_node_labels:
+  env: infra
+  logging: true
+  {{ 'cluster: ' ~ ocp_cluster if ocp_cluster is defined else '' }}
+

@@ -13,8 +13,15 @@
     line: "{{ default_project_objects }}"
     path: "{{ project_request_tempfile.path }}"
 
+# - name: Add node-selector annotation
+#   lineinfile:
+#     regexp: '^( *)(openshift.io/description: .+)$'
+#     line: '\1\2\n\1openshift.io/node-selector: env=app,client=common'
+#     path: "{{ project_request_tempfile.path }}"
+#     backrefs: true
+
 - name: Delete existing project request template
-  shell: "oc delete -n default -f {{ project_request_tempfile.path }}"
+  shell: "oc delete -n default -f {{ project_request_tempfile.path }} --ignore-not-found"
 
 - name: Create new project request template
   shell: "oc create -n default -f {{ project_request_tempfile.path }}"

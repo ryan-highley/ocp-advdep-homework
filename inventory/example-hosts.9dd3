@@ -23,7 +23,10 @@ openshift_master_default_subdomain=apps.9dd3.example.opentlc.com
 os_sdn_network_plugin_name='redhat/openshift-ovs-networkpolicy'
 
 openshift_hosted_infra_selector="env=infra"
-osm_default_node_selector="env=app"
+
+osm_default_node_selector="env=app,client=common"
+osm_project_request_message="Project creation has been disabled for users. Please contact your client administrator for assistance."
+osm_project_request_template="default/project-request"
 
 openshift_hosted_router_replicas=2
 
@@ -40,7 +43,7 @@ openshift_hosted_etcd_storage_nfs_directory=/srv/nfs
 openshift_hosted_etcd_storage_labels={'storage': 'etcd-asb'}
 openshift_hosted_etcd_storage_volume_name=etcd-asb
 openshift_hosted_etcd_storage_access_modes=['ReadWriteOnce']
-openshift_hosted_etcd_storage_volume_size=10G
+openshift_hosted_etcd_storage_volume_size=1Gi
 
 
 openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]

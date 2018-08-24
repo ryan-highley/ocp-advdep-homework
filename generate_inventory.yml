@@ -1,0 +1,148 @@
+---
+- name: Set inventory facts
+  hosts: localhost
+  gather_facts: false
+  tasks:
+  - name: set base inventory root
+    set_fact:
+      ocp_inventory_root: "/etc/ansible"
+  
+  - name: set vars file destinations
+    set_fact:
+      ocp_group_vars_dir: "{{ ocp_inventory_root }}/group_vars"
+      ocp_host_vars_dir: "{{ ocp_inventory_root }}/host_vars"
+
+  - name: set ocp_cluster_domain
+    set_fact:
+      ocp_cluster_domain: "{{ (ocp_cluster ~ '.') if ocp_cluster is defined else '' }}"
+
+  - name: set ocp internal and external domains
+    set_fact:
+      ocp_internal_domain: "{{ ocp_cluster_domain ~ (ocp_internal_domain | default('internal')) }}"
+      ocp_external_domain: "{{ ocp_cluster_domain ~ (ocp_external_domain | default('example.opentlc.com')) }}"
+
+  - name: set loadbalancer facts
+    set_fact:
+      ocp_loadbalancer_hostname: "{{ ocp_loadbalancer_hostname | default('loadbalancer') }}"
+      ocp_loadbalancer_count: "{{ ocp_loadbalancer_count | default(1) | int }}"
+
+  - name: set master facts
+    set_fact:
+      ocp_master_hostname: "{{ ocp_master_hostname | default('master') }}"
+      ocp_master_count: "{{ ocp_master_count | default(3) | int }}"
+
+  - name: set infranode facts
+    set_fact:
+      ocp_infranode_hostname: "{{ ocp_infranode_hostname | default('infranode') }}"
+      ocp_infranode_count: "{{ ocp_infranode_count | default(2) | int }}"
+
+  - name: set node facts
+    set_fact:
+      ocp_node_hostname: "{{ ocp_node_hostname | default('node') }}"
+      ocp_node_count: "{{ ocp_node_count | default(4) | int }}"
+
+  - name: set support facts
+    set_fact:
+      ocp_support_hostname: "{{ ocp_support_hostname | default('support') }}"
+      ocp_support_count: "{{ ocp_support_count | default(1) | int }}"
+
+- name: Ensure destination directories exist
+  hosts: localhost
+  gather_facts: false
+  tasks:
+  - file:
+      path: "{{ ocp_group_vars_dir }}"
+      state: directory
+      owner: root
+      group: root
+      mode: 0755
+  - file:
+      path: "{{ ocp_host_vars_dir }}"
+      state: directory
+      owner: root
+      group: root
+      mode: 0755
+
+- name: Generate hosts inventory file
+  hosts: localhost
+  gather_facts: false
+  tasks:
+  - template:
+      src: templates/hosts.yml.j2
+      dest: "{{ ocp_inventory_root }}/hosts"
+#      backup: yes
+      owner: root
+      group: root
+      mode: 0644
+
+- name: Generate group_vars files
+  hosts: localhost
+  gather_facts: false
+  tasks:
+  - name: Generate masters vars file
+    template:
+      src: templates/group_vars/masters.yml.j2
+      dest: "{{ ocp_group_vars_dir }}/masters"
+      owner: root
+      group: root
+      mode: 0644
+  - name: Generate infranodes vars file
+    template:
+      src: templates/group_vars/infranodes.yml.j2
+      dest: "{{ ocp_group_vars_dir }}/infranodes"
+      owner: root
+      group: root
+      mode: 0644
+  - name: Generate OSEv3 vars file
+    template:
+      src: templates/group_vars/OSEv3.yml.j2
+      dest: "{{ ocp_group_vars_dir }}/OSEv3"
+      owner: root
+      group: root
+      mode: 0644
+
+- name: Generate host_vars files
+  hosts: localhost
+  gather_facts: false
+  tasks:
+  - name: Generate master host files
+    template:
+      src: templates/host_vars/hosts.yml.j2
+      dest: "{{ ocp_host_vars_dir }}/{{ ocp_hostname }}"
+      owner: root
+      group: root
+      mode: 0644
+    vars:
+      ocp_hostname: "{{ ocp_master_hostname ~ item ~ '.' ~ ocp_internal_domain }}"
+    with_sequence: "start=1 end={{ ocp_master_count }}"
+  - name: Generate infranode host files
+    template:
+      src: templates/host_vars/hosts.yml.j2
+      dest: "{{ ocp_host_vars_dir }}/{{ ocp_hostname }}"
+      owner: root
+      group: root
+      mode: 0644
+    vars:
+      ocp_hostname: "{{ ocp_infranode_hostname ~ item ~ '.' ~ ocp_internal_domain }}"
+    with_sequence: "start=1 end={{ ocp_infranode_count }}"
+  - name: Generate appnode host files
+    template:
+      src: templates/host_vars/appnodes.yml.j2
+      dest: "{{ ocp_host_vars_dir }}/{{ ocp_hostname }}"
+      owner: root
+      group: root
+      mode: 0644
+    vars:
+      ocp_hostname: "{{ ocp_node_hostname ~ item ~ '.' ~ ocp_internal_domain }}"
+    with_sequence: "start=1 end={{ ocp_node_count }}"
+  - name: Generate support host files
+    template:
+      src: templates/host_vars/hosts.yml.j2
+      dest: "{{ ocp_host_vars_dir }}/{{ ocp_hostname }}"
+      owner: root
+      group: root
+      mode: 0644
+    vars:
+      ocp_hostname: "{{ ocp_support_hostname ~ item ~ '.' ~ ocp_internal_domain }}"
+    with_sequence: "start=1 end={{ ocp_support_count }}"
+

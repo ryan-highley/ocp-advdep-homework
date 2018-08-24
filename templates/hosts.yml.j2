@@ -1,0 +1,55 @@
+
+all:
+  children:
+    OSEv3:
+
+OSEv3:
+  children:
+    lb:
+    masters:
+    etcd:
+    nodes:
+    nfs:
+
+nodes:
+  children:
+    masters:
+    infranodes:
+    appnodes:
+
+lb:
+  hosts:
+{% for idx in range(1, (ocp_loadbalancer_count|int) + 1) %}
+    {{ ocp_loadbalancer_hostname ~ idx ~ '.' ~ ocp_internal_domain }}:
+{% endfor %}
+ 
+masters:
+  hosts:
+{% for idx in range(1, (ocp_master_count|int) + 1) %}
+    {{ ocp_master_hostname ~ idx ~ '.' ~ ocp_internal_domain }}:
+{% endfor %}
+
+etcd:
+  hosts:
+{% for idx in range(1, (ocp_master_count|int) + 1) %}
+    {{ ocp_master_hostname ~ idx ~ '.' ~ ocp_internal_domain }}:
+{% endfor %}
+
+infranodes:
+  hosts:
+{% for idx in range(1, (ocp_infranode_count|int) + 1) %}
+    {{ ocp_infranode_hostname ~ idx ~ '.' ~ ocp_internal_domain }}:
+{% endfor %}
+
+appnodes:
+  hosts:
+{% for idx in range(1, (ocp_node_count|int) + 1) %}
+    {{ ocp_node_hostname ~ idx ~ '.' ~ ocp_internal_domain }}:
+{% endfor %}
+
+nfs:
+  hosts:
+{% for idx in range(1, (ocp_support_count|int) + 1) %}
+    {{ ocp_support_hostname ~ idx ~ '.' ~ ocp_internal_domain }}:
+{% endfor %}
+

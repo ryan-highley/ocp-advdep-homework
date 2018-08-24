@@ -4,6 +4,7 @@
 
 - name: Remove /etc/origin
   hosts: nodes
+  gather_facts: false
   tasks:
   - file:
       path: /etc/origin
