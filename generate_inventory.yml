@@ -70,7 +70,7 @@
   - template:
       src: templates/hosts.yml.j2
       dest: "{{ ocp_inventory_root }}/hosts"
-#      backup: yes
+      backup: yes
       owner: root
       group: root
       mode: 0644

@@ -40,9 +40,13 @@ openshift_hosted_etcd_storage_access_modes: ['ReadWriteOnce']
 openshift_hosted_etcd_storage_volume_size: 1Gi
 
 openshift_master_identity_providers: 
-- {'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}
-openshift_master_htpasswd_users: 
-- {'admin': '$apr1$zU5enr/O$wk6SfV13j/oOLcCdGcX06.'}
+  'name': 'htpasswd_auth'
+  'login': 'true'
+  'challenge': 'true'
+  'kind': 'HTPasswdPasswordIdentityProvider'
+  'filename': '/etc/origin/master/htpasswd'
+openshift_master_htpasswd_users:
+  'admin': '$apr1$zU5enr/O$wk6SfV13j/oOLcCdGcX06.'
 
 openshift_logging_install_logging: True
 
