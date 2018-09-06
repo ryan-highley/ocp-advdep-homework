@@ -19,7 +19,7 @@ openshift_hosted_infra_selector: env=infra
 
 osm_default_node_selector: env=app,client=common
 osm_project_request_message: Project creation has been disabled for users.
-  Please contact your client administrator for assistance."
+  Please contact your client administrator for assistance.
 osm_project_request_template: default/project-request
 
 openshift_hosted_router_replicas: 2
@@ -40,13 +40,23 @@ openshift_hosted_etcd_storage_access_modes: ['ReadWriteOnce']
 openshift_hosted_etcd_storage_volume_size: 1Gi
 
 openshift_master_identity_providers: 
-  'name': 'htpasswd_auth'
-  'login': 'true'
-  'challenge': 'true'
-  'kind': 'HTPasswdPasswordIdentityProvider'
-  'filename': '/etc/origin/master/htpasswd'
+- name: htpasswd_auth
+  login: true
+  challenge: true
+  kind: HTPasswdPasswordIdentityProvider
+  filename: /etc/origin/master/htpasswd
+
 openshift_master_htpasswd_users:
-  'admin': '$apr1$zU5enr/O$wk6SfV13j/oOLcCdGcX06.'
+  admin: '$apr1$zU5enr/O$wk6SfV13j/oOLcCdGcX06.'
+
+openshift_master_admission_plugin_config:
+  PodNodeConstraints:
+    configuration:
+      apiVersion: v1
+      kind: PodNodeConstraintsConfig
+      nodeSelectorLabelBlacklist:
+      - kubernetes.io/hostname
+      clusterDefaultNodeSelector: env=app,client=common
 
 openshift_logging_install_logging: True
 

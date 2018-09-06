@@ -1,7 +1,28 @@
 ---
-- kind: ProjectRequest
-  apiVersion: v1
-  displayName: "Shared Jenkins"
-  description: "Shared Jenkins project for MitziCom"
-  metadata:
-    name: jenkins-shared
+- apiVersion: v1
+  kind: List
+  items:
+  - kind: ProjectRequest
+    apiVersion: v1
+    displayName: "Shared Jenkins"
+    description: "Shared Jenkins project for MitziCom"
+    metadata:
+      name: cicd
+  - kind: ProjectRequest
+    apiVersion: v1
+    displayName: "CICD Development"
+    description: "CICD Development project for MitziCom"
+    metadata:
+      name: cicd-dev
+  - kind: ProjectRequest
+    apiVersion: v1
+    displayName: "CICD Test"
+    description: "CICD Test project for MitziCom"
+    metadata:
+      name: cicd-test
+  - kind: ProjectRequest
+    apiVersion: v1
+    displayName: "CICD Production"
+    description: "CICD Production project for MitziCom"
+    metadata:
+      name: cicd-prod

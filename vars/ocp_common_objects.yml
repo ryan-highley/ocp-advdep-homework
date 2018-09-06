@@ -4,4 +4,10 @@ openshift_cluster_content:
   - name: jenkins-project
     file: templates/jenkins-project.yml
     file_action: create
+- object: deployments
+  content:
+  - name: deploy jenkins
+    template: openshift/jenkins-persistent
+    namespace: cicd
+
 

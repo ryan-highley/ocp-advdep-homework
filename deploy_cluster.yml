@@ -118,52 +118,52 @@
   tasks:
   - shell: "oc adm policy remove-cluster-role-from-group self-provisioner system:authenticated:oauth"
 
-# - name: Deploy OpenShift objects
-#   hosts: localhost
-#   gather_facts: false
-#   vars_files:
-#   - vars/ocp_common_objects.yml
-#   roles:
-#   - role: openshift-applier
-# 
+- name: Deploy OpenShift objects
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+  - vars/ocp_common_objects.yml
+  roles:
+  - role: openshift-applier
+
 # - name: Remove project self-provisioning cluster role
 #   hosts: localhost
 #   gather_facts: false
 #   tasks:
 #   - shell: "oc patch clusterrolebinding.rbac self-provisioners -p '{ \"subjects\": null, \"metadata\": { \"annotations\": { \"rbac.authorization.kubernetes.io/autoupdate\": \"false\" } } }'"
-
-- name: Update master configurations
-  hosts: masters
-  gather_facts: false
-  tasks:
-  - systemd:
-      name: atomic-openshift-master-api
-      state: stopped
-  - systemd:
-      name: atomic-openshift-master-controllers
-      state: stopped
-  - systemd:
-      name: atomic-openshift-node
-      state: stopped
-  - yedit:
-      state: present
-      src: /etc/origin/master/master-config.yaml
-      edits:
-      - key: admissionConfig.pluginConfig.PodNodeConstraints.configuration.apiVersion
-        value: v1
-      - key: admissionConfig.pluginConfig.PodNodeConstraints.configuration.kind
-        value: PodNodeConstraintsConfig
-      - key: admissionConfig.pluginConfig.PodNodeConstraints.configuration.nodeSelectorLabelBlacklist
-        value: [kubernetes.io/hostname]
-      - key: admissionConfig.pluginConfig.PodNodeSelector.configuration.podNodeSelectorPluginConfig.clusterDefaultNodeSelector
-        value: env=app,client=common
-  - systemd:
-      name: atomic-openshift-master-api
-      state: started
-  - systemd:
-      name: atomic-openshift-master-controllers
-      state: started
-  - systemd:
-      name: atomic-openshift-node
-      state: started
+# 
+# - name: Update master configurations
+#   hosts: masters
+#   gather_facts: false
+#   tasks:
+#   - systemd:
+#       name: atomic-openshift-master-api
+#       state: stopped
+#   - systemd:
+#       name: atomic-openshift-master-controllers
+#       state: stopped
+#   - systemd:
+#       name: atomic-openshift-node
+#       state: stopped
+#   - yedit:
+#       state: present
+#       src: /etc/origin/master/master-config.yaml
+#       edits:
+#       - key: admissionConfig.pluginConfig.PodNodeConstraints.configuration.apiVersion
+#         value: v1
+#       - key: admissionConfig.pluginConfig.PodNodeConstraints.configuration.kind
+#         value: PodNodeConstraintsConfig
+#       - key: admissionConfig.pluginConfig.PodNodeConstraints.configuration.nodeSelectorLabelBlacklist
+#         value: [kubernetes.io/hostname]
+#       - key: admissionConfig.pluginConfig.PodNodeSelector.configuration.podNodeSelectorPluginConfig.clusterDefaultNodeSelector
+#         value: env=app,client=common
+#   - systemd:
+#       name: atomic-openshift-master-api
+#       state: started
+#   - systemd:
+#       name: atomic-openshift-master-controllers
+#       state: started
+#   - systemd:
+#       name: atomic-openshift-node
+#       state: started
 
