@@ -39,12 +39,21 @@
   - name: set node facts
     set_fact:
       ocp_node_hostname: "{{ ocp_node_hostname | default('node') }}"
-      ocp_node_count: "{{ ocp_node_count | default(4) | int }}"
+      ocp_node_count: "{{ ocp_node_count | default(1) | int }}"
 
   - name: set support facts
     set_fact:
       ocp_support_hostname: "{{ ocp_support_hostname | default('support') }}"
       ocp_support_count: "{{ ocp_support_count | default(1) | int }}"
+
+  - name: set infrastructure storage facts
+    set_fact:
+      ocp_storage_kind: nfs
+      ocp_storage_nfs_options: "'*(rw,root_squash)'"
+      ocp_storage_nfs_directory: /srv/nfs
+      ocp_storage_type: pvc
+      ocp_storage_access_modes: "['ReadWriteOnce']"
+      ocp_storage_volume_size: 10Gi
 
 - name: Ensure destination directories exist
   hosts: localhost

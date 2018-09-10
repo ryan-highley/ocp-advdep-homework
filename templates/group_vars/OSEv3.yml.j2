@@ -22,22 +22,22 @@ osm_project_request_message: Project creation has been disabled for users.
   Please contact your client administrator for assistance.
 osm_project_request_template: default/project-request
 
-openshift_hosted_router_replicas: 2
+openshift_hosted_router_replicas: {{ ocp_infranode_count }}
 
-openshift_hosted_registry_storage_kind: nfs
+openshift_hosted_registry_storage_kind: {{ ocp_storage_kind }}
 openshift_hosted_registry_storage_access_modes: ['ReadWriteMany']
-openshift_hosted_registry_storage_nfs_directory: /srv/nfs
-openshift_hosted_registry_storage_nfs_options: '*(rw,root_squash)'
+openshift_hosted_registry_storage_nfs_directory: {{ ocp_storage_nfs_directory }}
+openshift_hosted_registry_storage_nfs_options: {{ ocp_storage_nfs_options }}
 openshift_hosted_registry_storage_volume_name: registry
 openshift_hosted_registry_storage_volume_size: 20Gi
 
-openshift_hosted_etcd_storage_kind: nfs
+openshift_hosted_etcd_storage_kind: {{ ocp_storage_kind }}
+openshift_hosted_etcd_storage_access_modes: {{ ocp_storage_access_modes }}
+openshift_hosted_etcd_storage_nfs_directory: {{ ocp_storage_nfs_directory }}
 openshift_hosted_etcd_storage_nfs_options: "*(rw,root_squash,sync,no_wdelay)"
-openshift_hosted_etcd_storage_nfs_directory: /srv/nfs
-openshift_hosted_etcd_storage_labels: {'storage': 'etcd-asb'}
 openshift_hosted_etcd_storage_volume_name: etcd-asb
-openshift_hosted_etcd_storage_access_modes: ['ReadWriteOnce']
 openshift_hosted_etcd_storage_volume_size: 1Gi
+openshift_hosted_etcd_storage_labels: {'storage': 'etcd-asb'}
 
 openshift_master_identity_providers: 
 - name: htpasswd_auth
@@ -60,15 +60,15 @@ openshift_master_admission_plugin_config:
 
 openshift_logging_install_logging: True
 
-openshift_logging_storage_kind: nfs
-openshift_logging_storage_access_modes: ['ReadWriteOnce']
-openshift_logging_storage_nfs_directory: /srv/nfs
-openshift_logging_storage_nfs_options: '*(rw,root_squash)'
+openshift_logging_storage_kind: {{ ocp_storage_kind }}
+openshift_logging_storage_access_modes: {{ ocp_storage_access_modes }}
+openshift_logging_storage_nfs_directory: {{ ocp_storage_nfs_directory }}
+openshift_logging_storage_nfs_options: {{ ocp_storage_nfs_options }}
 openshift_logging_storage_volume_name: logging
-openshift_logging_storage_volume_size: 10Gi
+openshift_logging_storage_volume_size: {{ ocp_storage_volume_size }}
 openshift_logging_storage_labels: {'storage': 'logging'}
 
-openshift_logging_es_cluster_size: 1
+openshift_logging_es_cluster_size: {{ ocp_infranode_count }}
 
 openshift_logging_es_nodeselector: {"env": "infra"}
 openshift_logging_kibana_nodeselector: {"env": "infra"}
@@ -76,12 +76,12 @@ openshift_logging_curator_nodeselector: {"env": "infra"}
 
 openshift_metrics_install_metrics: True
 
-openshift_metrics_storage_kind: nfs
-openshift_metrics_storage_access_modes: ['ReadWriteOnce']
-openshift_metrics_storage_nfs_directory: /srv/nfs
-openshift_metrics_storage_nfs_options: '*(rw,root_squash)'
+openshift_metrics_storage_kind: {{ ocp_storage_kind }}
+openshift_metrics_storage_access_modes: {{ ocp_storage_access_modes }}
+openshift_metrics_storage_nfs_directory: {{ ocp_storage_nfs_directory }}
+openshift_metrics_storage_nfs_options: {{ ocp_storage_nfs_options }}
 openshift_metrics_storage_volume_name: metrics
-openshift_metrics_storage_volume_size: 10Gi
+openshift_metrics_storage_volume_size: {{ ocp_storage_volume_size }}
 openshift_metrics_storage_labels: {'storage': 'metrics'}
 
 openshift_metrics_cassandra_nodeselector: {"env": "infra"}
@@ -98,32 +98,34 @@ openshift_hosted_prometheus_deploy: true
 openshift_prometheus_node_selector: {"env": "infra"}
 openshift_prometheus_namespace: openshift-metrics
 
-openshift_prometheus_storage_kind: nfs
-openshift_prometheus_storage_access_modes: ['ReadWriteOnce']
-openshift_prometheus_storage_nfs_directory: /srv/nfs
-openshift_prometheus_storage_nfs_options: '*(rw,root_squash)'
+openshift_prometheus_storage_kind: {{ ocp_storage_kind }}
+openshift_prometheus_storage_access_modes: {{ ocp_storage_access_modes }}
+openshift_prometheus_storage_nfs_directory: {{ ocp_storage_nfs_directory }}
+openshift_prometheus_storage_nfs_options: {{ ocp_storage_nfs_options }}
 openshift_prometheus_storage_volume_name: prometheus
-openshift_prometheus_storage_volume_size: 10Gi
+openshift_prometheus_storage_volume_size: {{ ocp_storage_volume_size }}
 openshift_prometheus_storage_labels: {'storage': 'prometheus'}
-openshift_prometheus_storage_type: pvc
+openshift_prometheus_storage_type: {{ ocp_storage_type }}
 
-openshift_prometheus_alertmanager_storage_kind: nfs
-openshift_prometheus_alertmanager_storage_access_modes: ['ReadWriteOnce']
-openshift_prometheus_alertmanager_storage_nfs_directory: /srv/nfs
-openshift_prometheus_alertmanager_storage_nfs_options: '*(rw,root_squash)'
+openshift_prometheus_alertmanager_storage_kind: {{ ocp_storage_kind }}
+openshift_prometheus_alertmanager_storage_access_modes: {{ ocp_storage_access_modes }}
+openshift_prometheus_alertmanager_storage_nfs_directory: {{ ocp_storage_nfs_directory }}
+openshift_prometheus_alertmanager_storage_nfs_options: {{ ocp_storage_nfs_options }}
 openshift_prometheus_alertmanager_storage_volume_name: prometheus-alertmanager
-openshift_prometheus_alertmanager_storage_volume_size: 10Gi
+openshift_prometheus_alertmanager_storage_volume_size: {{ ocp_storage_volume_size }}
 openshift_prometheus_alertmanager_storage_labels: {'storage': 'prometheus-alertmanager'}
-openshift_prometheus_alertmanager_storage_type: pvc
+openshift_prometheus_alertmanager_storage_type: {{ ocp_storage_type }}
 
-openshift_prometheus_alertbuffer_storage_kind: nfs
-openshift_prometheus_alertbuffer_storage_access_modes: ['ReadWriteOnce']
-openshift_prometheus_alertbuffer_storage_nfs_directory: /srv/nfs
-openshift_prometheus_alertbuffer_storage_nfs_options: '*(rw,root_squash)'
+openshift_prometheus_alertbuffer_storage_kind: {{ ocp_storage_kind }}
+openshift_prometheus_alertbuffer_storage_access_modes: {{ ocp_storage_access_modes }}
+openshift_prometheus_alertbuffer_storage_nfs_directory: {{ ocp_storage_nfs_directory }}
+openshift_prometheus_alertbuffer_storage_nfs_options: {{ ocp_storage_nfs_options }}
 openshift_prometheus_alertbuffer_storage_volume_name: prometheus-alertbuffer
-openshift_prometheus_alertbuffer_storage_volume_size: 10Gi
+openshift_prometheus_alertbuffer_storage_volume_size: {{ ocp_storage_volume_size }}
 openshift_prometheus_alertbuffer_storage_labels: {'storage': 'prometheus-alertbuffer'}
-openshift_prometheus_alertbuffer_storage_type: pvc
+openshift_prometheus_alertbuffer_storage_type: {{ ocp_storage_type }}
 
 openshift_prometheus_node_exporter_image_version: v3.9
+
+openshift_web_console_cluster_resource_overrides_enabled: True
 
