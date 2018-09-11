@@ -16,6 +16,7 @@ openshift_master_default_subdomain: apps.{{ ocp_external_domain }}
 os_sdn_network_plugin_name: redhat/openshift-ovs-networkpolicy
 
 openshift_hosted_infra_selector: env=infra
+# openshift_web_console_nodeselector: {'env': 'master'}
 
 osm_default_node_selector: env=app,client=common
 osm_project_request_message: Project creation has been disabled for users.
@@ -124,8 +125,4 @@ openshift_prometheus_alertbuffer_storage_volume_name: prometheus-alertbuffer
 openshift_prometheus_alertbuffer_storage_volume_size: {{ ocp_storage_volume_size }}
 openshift_prometheus_alertbuffer_storage_labels: {'storage': 'prometheus-alertbuffer'}
 openshift_prometheus_alertbuffer_storage_type: {{ ocp_storage_type }}
-
-openshift_prometheus_node_exporter_image_version: v3.9
-
-openshift_web_console_cluster_resource_overrides_enabled: True
 

@@ -5,23 +5,23 @@
   tasks:
   - ping:
 
-# - name: Update all packages
-#   hosts: all
-#   gather_facts: false
-#   tasks:
-#   - yum:
-#       name: '*'
-#       state: latest
-# 
-# - name: Ensure local has OpenShift utils and clients
-#   hosts: localhost
-#   gather_facts: false
-#   tasks:
-#   - yum:
-#       name:
-#       - atomic-openshift-utils
-#       - atomic-openshift-clients
-#       state: latest
+- name: Update all packages
+  hosts: all
+  gather_facts: false
+  tasks:
+  - yum:
+      name: '*'
+      state: latest
+
+- name: Ensure local has OpenShift utils and clients
+  hosts: localhost
+  gather_facts: false
+  tasks:
+  - yum:
+      name:
+      - atomic-openshift-utils
+      - atomic-openshift-clients
+      state: latest
 
 - name: Ensure docker is running on nodes
   hosts: nodes
