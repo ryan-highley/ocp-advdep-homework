@@ -35,6 +35,7 @@
     set_fact:
       ocp_infranode_hostname: "{{ ocp_infranode_hostname | default('infranode') }}"
       ocp_infranode_count: "{{ ocp_infranode_count | default(2) | int }}"
+      ocp_infranode_selector: "{{ ocp_infranode_selector | default('{ env: infra }') }}"
 
   - name: set node facts
     set_fact:
