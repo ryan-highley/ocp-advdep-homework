@@ -19,7 +19,7 @@
   tasks:
   - yum:
       name:
-      - atomic-openshift-utils
+#      - atomic-openshift-utils
       - atomic-openshift-clients
       state: latest
 

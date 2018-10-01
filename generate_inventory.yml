@@ -40,7 +40,7 @@
   - name: set node facts
     set_fact:
       ocp_node_hostname: "{{ ocp_node_hostname | default('node') }}"
-      ocp_node_count: "{{ ocp_node_count | default(1) | int }}"
+      ocp_node_count: "{{ ocp_node_count | default(4) | int }}"
 
   - name: set support facts
     set_fact:
@@ -103,6 +103,13 @@
       owner: root
       group: root
       mode: 0644
+  - name: Generate appnodes vars file
+    template:
+      src: templates/group_vars/appnodes.yml.j2
+      dest: "{{ ocp_group_vars_dir }}/appnodes"
+      owner: root
+      group: root
+      mode: 0644
   - name: Generate OSEv3 vars file
     template:
       src: templates/group_vars/OSEv3.yml.j2
@@ -137,7 +144,7 @@
     with_sequence: "start=1 end={{ ocp_infranode_count }}"
   - name: Generate appnode host files
     template:
-      src: templates/host_vars/appnodes.yml.j2
+      src: templates/host_vars/hosts.yml.j2
       dest: "{{ ocp_host_vars_dir }}/{{ ocp_hostname }}"
       owner: root
       group: root

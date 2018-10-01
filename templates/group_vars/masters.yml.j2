@@ -1,6 +1,3 @@
 ---
-openshift_node_labels:
-  env: master
-  logging: true
-  {{ 'cluster: ' ~ ocp_cluster if ocp_cluster is defined else '' }}
+openshift_node_group_name: node-config-master
 

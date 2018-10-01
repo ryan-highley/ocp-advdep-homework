@@ -1,8 +1,0 @@
----
-openshift_hostname: {{ ocp_hostname }}
-openshift_node_labels:
-  env: app
-  logging: true
-  {{ 'cluster: ' ~ ocp_cluster if ocp_cluster is defined else '' }}
-  {{ 'client: ' ~ ocp_client if ocp_client is defined else '' }}
-
